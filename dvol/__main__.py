@@ -4,7 +4,7 @@
 # TODO: when removing, should loop through existing mappings, delete those folders, then nuke the root/project folder
 # TODO: after removing files, recursivly delete empty folders upward
 
-version="0.0.4"
+version="0.0.5"
 import argparse
 
 from dvol_helpers.dvol_add import determine_add
