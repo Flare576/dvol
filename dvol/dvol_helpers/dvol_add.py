@@ -5,9 +5,9 @@ from git import Repo
 from shutil import rmtree
 from subprocess import run, DEVNULL
 
-from dvol_helpers.common import *
-from dvol_helpers.compose_tools import *
-from dvol_helpers.docker_tools import *
+from .common import *
+from .compose_tools import *
+from .docker_tools import *
 
 def determine_add (remote, local_path = '', **kwargs):
     # todo: make parsearges not send this as a list

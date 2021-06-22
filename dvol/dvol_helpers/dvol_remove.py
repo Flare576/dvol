@@ -1,9 +1,9 @@
 import os
 from shutil import rmtree
 
-from dvol_helpers.common import *
-from dvol_helpers.compose_tools import *
-from dvol_helpers.docker_tools import *
+from .common import *
+from .compose_tools import *
+from .docker_tools import *
 
 def determine_remove (**kwargs):
     container, *rest = get_updated_profile(**kwargs)

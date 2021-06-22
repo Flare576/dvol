@@ -4,10 +4,11 @@ import os
 import sys
 import yaml
 
-from configparser import ConfigParser
-from dvol_helpers.config import config_folder, config_store
 from subprocess import check_output, run
-from dvol_helpers.common import *
+from configparser import ConfigParser
+
+from .config import config_folder, config_store
+from .common import *
 
 def read_override (project, service):
     override_file = f'{config_folder}/{project}.yml'

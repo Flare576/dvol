@@ -3,7 +3,7 @@ import json
 import sys
 
 from subprocess import check_output, run, DEVNULL
-from dvol_helpers.common import *
+from .common import *
 
 
 def get_mounts_as_volumes (container):
