@@ -4,9 +4,9 @@ from .docker_tools import *
 
 def determine_print (*, container, **kwargs):
     container, *rest = get_updated_profile(**kwargs)
-    _, configs, project, service = get_compose_tags(container)
-    if configs:
-        print_compose (container, configs, project, service, **kwargs)
+    tags = get_compose_tags(container)
+    if tags:
+        print_compose (tags['container'], tags['configs'], tags['project'], tags['service'], **kwargs)
     else:
         print_docker (container)
 
@@ -33,7 +33,7 @@ def print_compose (container, configs, project, service, **kwargs):
         print(f_path(override_file))
         mapped_service = list(override_data['services'])[0]
         container_from_service = f'{project}_{mapped_service}_1'
-        _, mapped_configs, _, _ = get_compose_tags(container_from_service)
+        mapped_configs = get_compose_tags(container_from_service)['configs']
         if override_file in mapped_configs:
             # we're running with dvol, this container just doesn't have mappings
             print('  None')

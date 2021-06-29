@@ -4,10 +4,10 @@
 # TODO: when removing, should loop through existing mappings, delete those folders, then nuke the root/project folder
 # TODO: after removing files, recursivly delete empty folders upward
 
-from dvol.cli import dispatch
+import cli
 
 def main ():
-    dispatch()
+    cli.dispatch()
 
 if __name__ == '__main__':
     main()

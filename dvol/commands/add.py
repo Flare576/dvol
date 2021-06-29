@@ -1,7 +1,7 @@
 from argparse import RawDescriptionHelpFormatter
 
-from dvol.dvol_helpers.dvol_add import determine_add
-from dvol.dvol_helpers.common import *
+from dvol_helpers.dvol_add import determine_add
+from dvol_helpers.common import *
 
 cmd_add_help = "Add a new volume mapping, or update an existing one."
 force_help = 'Force re-copying remote folder contents, destroying the specified folder and any contents'

@@ -1,4 +1,4 @@
-from dvol.dvol_helpers.compose_tools import disable_dvol
+from dvol_helpers.compose_tools import disable_dvol
 
 def create (subs):
     parser = subs.add_parser('disable', help = 'removes dvol mapping')

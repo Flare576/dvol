@@ -7,9 +7,9 @@ from .docker_tools import *
 
 def determine_remove (**kwargs):
     container, *rest = get_updated_profile(**kwargs)
-    info, *rest = get_compose_tags(container)
+    tags = get_compose_tags(container)
 
-    if info:
+    if tags:
         remove_compose(**kwargs)
     else:
         remove_docker(**kwargs)
@@ -47,14 +47,16 @@ def remove_process (*, volumes, remote = '', local_path = '', remove_files = Fal
 
 def remove_compose (**kwargs):
     container, root, execute, *rest = get_updated_profile(**kwargs)
-    working_dir, configs, project, service = get_compose_tags(container)
-    override_file, override_data = read_override(project, service)
+    tags = get_compose_tags(container)
+    service = tags['service']
+    override_file, override_data = read_override(tags['project'], service)
     if not override_data['services'].get(service):
         print(f'No mappings found for {f_argument(service)}')
         quit()
     volumes = override_data['services'][service]['volumes']
 
     volumes = remove_process(volumes = volumes, **kwargs)
+    configs = tags['configs']
 
     if not len(volumes):
         override_file in configs and configs.remove(override_file)
@@ -65,4 +67,4 @@ def remove_compose (**kwargs):
     else:
         write_override(override_file, override_data)
 
-    recreate_compose(working_dir, configs, project, execute, service)
+    recreate_compose(tags['working_dir'], configs, tags['project'], tags['execute'], service)

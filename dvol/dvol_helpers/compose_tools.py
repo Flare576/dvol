@@ -62,18 +62,21 @@ def get_compose_tags (container = None):
     inspect = json.loads(inspect)
     labels = jq.compile('.[0].Config.Labels').input(inspect).first()
     if not labels:
-        return (None, None, None, None)
-    service = jq.compile(f'."com.docker.compose.service"').input(labels).first()
+        return (None)
+    data = {}
+    data['service'] = jq.compile(f'."com.docker.compose.service"').input(labels).first()
+    data['oneoff'] = jq.compile(f'."com.docker.compose.oneoff"').input(labels).first()
 
     project_base = '"com.docker.compose.project'
-    working_dir = jq.compile(f'.{project_base}.working_dir\"').input(labels).first()
-    configs = jq.compile(f'.{project_base}.config_files" | split(",")').input(labels).first()
-    project = jq.compile(f'.{project_base}"').input(labels).first()
+    data['working_dir'] = jq.compile(f'.{project_base}.working_dir\"').input(labels).first()
+    data['project'] = jq.compile(f'.{project_base}"').input(labels).first()
     # Convert all configs to absolute reference
+    configs = jq.compile(f'.{project_base}.config_files" | split(",")').input(labels).first()
     for idx, config in enumerate(configs):
         if config[0] == '/': continue
         configs[idx] = f'{working_dir}/{config.split("/")[-1]}'
-    return (working_dir, configs, project, service)
+    data['configs'] = configs
+    return data
 
 def get_updated_profile (
     profile = 'default',
@@ -160,24 +163,24 @@ def recreate_compose (working_dir, configs, project, execute, service, *, add = 
 
 def enable_dvol (**kwargs):
     container, root, execute, use_git = get_updated_profile(**kwargs)
-    working_dir, configs, project, service = get_compose_tags(container)
-    if not configs:
+    tags = get_compose_tags(container)
+    if not tags['configs']:
         print ("[31mEnable/Disable is meaningless without 'docker compose'[0m")
         quit()
-    override_file, override_data = read_override(project, service)
-    configs = set(configs)
+    override_file, override_data = read_override(tags['project'], tags['service'])
+    configs = set(tags['configs'])
     configs.add(override_file)
     configs = list(configs)
-    recreate_compose(working_dir, configs, project, execute, service)
+    recreate_compose(tags['working_dir'], configs, tags['project'], tags['execute'], tags['service'])
 
 def disable_dvol (**kwargs):
     container, root, execute, use_git = get_updated_profile(**kwargs)
-    working_dir, configs, project, service = get_compose_tags(container)
+    tags = get_compose_tags(container)
     if not configs:
         print ("[31mEnable/Disable is meaningless without 'docker compose'[0m")
         quit()
-    override_file, override_data = read_override(project, service)
-    configs = set(configs)
+    override_file, override_data = read_override(tags['project'], tags['service'])
+    configs = set(tags['configs'])
     configs.remove(override_file)
     configs = list(configs)
-    recreate_compose(working_dir, configs, project, execute, service)
+    recreate_compose(tags['working_dir'], configs, tags['project'], tags['execute'], tags['service'])

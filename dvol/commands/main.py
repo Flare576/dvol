@@ -1,7 +1,7 @@
 from argparse import ArgumentParser
-from dvol.dvol_helpers.common import *
+from dvol_helpers.common import *
 
-from dvol import __version__
+import VERSION
 
 cmd_main_desc = "Manage docker and docker compose volume mappings easily!"
 container_help = f"Container name; use with {f_command('config')} to save default, or with {f_command('add')}/{f_command('remove')} to override"
@@ -12,7 +12,7 @@ profile_help = "Name of profile from config to use."
 
 def create ():
     parser = ArgumentParser(prog = 'dvol', description = cmd_main_desc)
-    parser.add_argument( "--version", "-v", action='version',  version = f'%(prog)s v{__version__}' )
+    parser.add_argument( "--version", "-v", action='version',  version = f'%(prog)s v{VERSION.__version__}' )
     parser.add_argument( "--container", "-c", help = container_help)
     parser.add_argument( "--root", "-r", help = root_help)
     parser.add_argument( "--execute", "-e", help = execute_help)

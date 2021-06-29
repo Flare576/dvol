@@ -20,7 +20,7 @@ def determine_add (remote, local_path = '', **kwargs):
     local_path = get_local_path(local_path, root, container, remote)
 
 
-    info, *rest = get_compose_tags(container)
+    info = get_compose_tags(container)
     if info:
         add_compose(remote, **kwargs, local_path = local_path)
     else:
@@ -40,10 +40,10 @@ def add_docker (remote, force = False, solution = None, local_path = '', **kwarg
 
 def add_compose (remote, force = False, solution = None, local_path = '', **kwargs):
     container, root, execute, use_git = get_updated_profile(**kwargs)
-    working_dir, configs, project, service = get_compose_tags(container)
-    override_file, override_data = read_override(project, service)
+    tags = get_compose_tags(container)
+    override_file, override_data = read_override(tags['project'], tags['service'])
 
-    configs = set(configs)
+    configs = set(tags['configs'])
     configs.add(override_file)
     configs = list(configs)
 
@@ -53,13 +53,10 @@ def add_compose (remote, force = False, solution = None, local_path = '', **kwar
             continue
         with open(config, 'r') as file:
             full = yaml.safe_load(file.read())
-            volumes = full['services'].get(service, {}).get('volumes', [])
+            volumes = full['services'].get(tags['service'], {}).get('volumes', [])
             for e_volume in volumes: # uses remote(p), config, solution?, volume, [service,override, force]
                 segments = e_volume.split(':')
-                if len(segments) != 2:
-                    print("Volume does not have 2 ':' characters. I r confused")
-                    quit()
-                existing_local, existing_remote = segments
+                existing_local, existing_remote, *rest = segments
                 if existing_remote == remote:
                     if volume:
                         print('It appears that there are two mappings to this location already... freaking out')
@@ -96,7 +93,7 @@ def add_compose (remote, force = False, solution = None, local_path = '', **kwar
         local_path = local_path,
         force = force,
         use_git = use_git,
-        recreate_pair = (recreate_compose, (working_dir, configs, project, execute, service))
+        recreate_pair = (recreate_compose, (tags['working_dir'], configs, tags['project'], execute, tags['service']))
     )
 
     # todo: help for create needs to mention backup file, always printing location of main compose
@@ -106,12 +103,12 @@ def sync (*, container, remote, local_path, force, use_git, recreate_pair):
     (recreate_fn, recreate_args) = recreate_pair
     if force and os.path.isdir(local_path):
         print(f'Deleting {f_folder(local_path)}')
-        rmtree(local_path)
+        rmtree(local_path, ignore_errors = True)
 
     remove = None
     volumes = get_mounts_as_volumes(container)
     for volume in volumes:
-        if remote in volume:
+        if remote == volume:
             remove = volume
             break
 

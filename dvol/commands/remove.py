@@ -1,5 +1,5 @@
-from dvol.dvol_helpers.dvol_remove import determine_remove
-from dvol.dvol_helpers.common import *
+from dvol_helpers.dvol_remove import determine_remove
+from dvol_helpers.common import *
 
 files_help = 'Also remove local folder'
 path_help = 'Override {root}{container}{remote} path logic and use provided folder'

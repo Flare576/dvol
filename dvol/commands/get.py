@@ -1,4 +1,4 @@
-from dvol.dvol_helpers.dvol_print import determine_print
+from dvol_helpers.dvol_print import determine_print
 
 cmd_get_volumes_desc = "Get list of volumes and their sources"
 
